@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
@@ -15,12 +17,24 @@ namespace ComputerLanguageWordle
     {
       Action<string> display = Console.WriteLine;
       var computerLanguageList = new List<string>();
+      var computerLanguageListForWordle = new List<string>();
       computerLanguageList.AddRange(GetElements("ComputerLanguages.xml", "Language"));
       display("Computer language wordle");
-
-
+      computerLanguageListForWordle.AddRange(GetRandomItems(computerLanguageList, 500));
+      // TODO create the Wordle image
       display("Press any key to exit: ");
       Console.ReadKey();
+    }
+
+    private static IEnumerable<string> GetRandomItems(List<string> itemList, int numberOfItems)
+    {
+      List<string>result = new List<string>();
+      for (int j = 0; j < numberOfItems; j++)
+      {
+        result.Add(itemList[GenerateRandomNumberUsingCrypto(0, itemList.Count - 1)]);
+      }
+
+      return result;
     }
 
     private static IEnumerable<string> GetElements(string fileName, string tag)
@@ -51,6 +65,24 @@ namespace ComputerLanguageWordle
 
       elementList = null;
       xmlDoc = null;
+      return result;
+    }
+
+    private static int GenerateRandomNumberUsingCrypto(int min, int max)
+    {
+      if (max >= 255)
+      {
+        max = 254;
+      }
+
+      int result;
+      RNGCryptoServiceProvider crypto = new RNGCryptoServiceProvider();
+      byte[] randomNumber = new byte[1];
+      do
+      {
+        crypto.GetBytes(randomNumber);
+        result = randomNumber[0];
+      } while (result <= min || result >= max);
       return result;
     }
   }
