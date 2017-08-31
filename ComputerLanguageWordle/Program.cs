@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace ComputerLanguageWordle
 {
@@ -13,9 +15,9 @@ namespace ComputerLanguageWordle
     {
       Action<string> display = Console.WriteLine;
       var computerLanguageList = new List<string>();
-      computerLanguageList.AddRange(GetElements("ComputerLanguages.xml", "Languages"));
-
+      computerLanguageList.AddRange(GetElements("ComputerLanguages.xml", "Language"));
       display("Computer language wordle");
+
 
       display("Press any key to exit: ");
       Console.ReadKey();
@@ -23,36 +25,32 @@ namespace ComputerLanguageWordle
 
     private static IEnumerable<string> GetElements(string fileName, string tag)
     {
-      IEnumerable<string> result = new List<string>();
+      List<string> result = new List<string>();
       if (string.IsNullOrEmpty(fileName))
       {
         return result;
       }
 
+      XmlDocument xmlDoc = new XmlDocument();
       try
       {
-        result = ParseXmlToList(fileName, tag);
-
+        xmlDoc.Load(fileName);
       }
       catch (Exception exception)
       {
-        Console.WriteLine($"An error occured: {exception.Message}");
+        Console.WriteLine($"Error while loading the XML file: {fileName}");
+        Console.WriteLine($"The exception is {exception.Message}");
         return result;
       }
 
-      return result;
-    }
-
-    private static IEnumerable<string> ParseXmlToList(string fileName, string firstXmlTag)
-    {
-      var result = new List<string>();
-      using (var reader = XmlReader.Create(new StringReader(fileName)))
+      XmlNodeList elementList = xmlDoc.GetElementsByTagName(tag);
+      for (int i = 0; i < elementList.Count; i++)
       {
-        reader.ReadToFollowing(firstXmlTag);
-        string genre = reader.Value;
-        result.Add(genre);
+        result.Add(elementList[i].InnerText);
       }
 
+      elementList = null;
+      xmlDoc = null;
       return result;
     }
   }
