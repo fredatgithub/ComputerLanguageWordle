@@ -22,6 +22,7 @@ namespace ComputerLanguageWordle
       display("Computer language wordle");
       computerLanguageListForWordle.AddRange(GetRandomItems(computerLanguageList, 500));
       // TODO create the Wordle image from the computerLanguageListForWordle and save it to current directory
+      // save several images and start a process to display them
 
       display("Press any key to exit: ");
       Console.ReadKey();
